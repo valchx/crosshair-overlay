@@ -7,8 +7,8 @@ pub fn main() !void {
         .window_resizable = false,
         .window_transparent = true,
         .window_undecorated = true,
-        .window_topmost = true,
         .window_mouse_passthrough = true,
+        .window_topmost = true,
     });
     rl.initWindow(w, h, "CrossHair Test");
 
@@ -39,24 +39,66 @@ fn setup_crosshair_texture(w: i32, h: i32) !rl.RenderTexture2D {
     rl.beginTextureMode(target);
 
     rl.clearBackground(rl.Color.blank);
+
+    regular_crosshair(4, .{ .r = 255, .g = 255, .b = 255, .a = 195 }, true, 8);
+
+    rl.endTextureMode();
+
+    return target;
+}
+
+fn regular_crosshair(
+    size: i32,
+    color: rl.Color,
+    dot: bool,
+    gap: i32,
+) void {
     const center = .{
         .x = @divTrunc(rl.getScreenWidth(), 2),
         .y = @divTrunc(rl.getScreenHeight(), 2),
     };
 
-    const dot = .{ .size = 10, .color = rl.Color{ .r = 255, .g = 0, .b = 0, .a = 192 } };
+    if (dot) {
+        rl.drawRectangle(
+            center.x - @divTrunc(size, 2),
+            center.y - @divTrunc(size, 2),
+            size,
+            size,
+            color,
+        );
+    }
 
     rl.drawRectangle(
-        center.x - @divTrunc(dot.size, 2),
-        center.y - @divTrunc(dot.size, 2),
-        dot.size,
-        dot.size,
-        dot.color,
+        center.x - @divTrunc(size, 2) - gap - size,
+        center.y - @divTrunc(size, 2),
+        size * 2,
+        size,
+        color,
     );
 
-    rl.endTextureMode();
+    rl.drawRectangle(
+        center.x - @divTrunc(size, 2) + gap,
+        center.y - @divTrunc(size, 2),
+        size * 2,
+        size,
+        color,
+    );
 
-    return target;
+    rl.drawRectangle(
+        center.x - @divTrunc(size, 2),
+        center.y - @divTrunc(size, 2) - gap - size,
+        size,
+        size * 2,
+        color,
+    );
+
+    rl.drawRectangle(
+        center.x - @divTrunc(size, 2),
+        center.y - @divTrunc(size, 2) + gap,
+        size,
+        size * 2,
+        color,
+    );
 }
 
 fn draw_crosshair(w: f32, h: f32, texture: rl.Texture) void {
